@@ -13,24 +13,23 @@ public class MainManager : MonoBehaviour
     public Text ScoreText;
     public Text BestScoreText;
     public GameObject GameOverText;
-    
+
     private bool m_Started = false;
     private int m_Points;
-    
+
     private bool m_GameOver = false;
 
     private void Awake()
     {
-        name = GameManager.Instance != null ? GameManager.Instance.Name : "Name";
-        BestScoreText.text = $"Best Score : {name} : 0";
+        RenderText();
     }
     // Start is called before the first frame update
     void Start()
     {
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
-        
-        int[] pointCountArray = new [] {1,1,2,2,5,5};
+
+        int[] pointCountArray = new[] { 1, 1, 2, 2, 5, 5 };
         for (int i = 0; i < LineCount; ++i)
         {
             for (int x = 0; x < perLine; ++x)
@@ -70,7 +69,25 @@ public class MainManager : MonoBehaviour
     void AddPoint(int point)
     {
         m_Points += point;
-        ScoreText.text = $"Score : {m_Points}";
+        CheckBestScore();
+        RenderText();
+    }
+
+    private void CheckBestScore()
+    {
+        if (m_Points > GameManager.Instance.HighestScore)
+        {
+            GameManager.Instance.HighestScore = m_Points;
+            GameManager.Instance.HighestName = GameManager.Instance.Name;
+            GameManager.Instance.SaveScore();
+        }
+    }
+
+    private void RenderText()
+    {
+        name = GameManager.Instance != null ? GameManager.Instance.Name : "Name";
+        ScoreText.text = $"Score {name} : {m_Points}";
+        BestScoreText.text = $"Best Score: {GameManager.Instance.HighestName} : {GameManager.Instance.HighestScore}";
     }
 
     public void GameOver()
